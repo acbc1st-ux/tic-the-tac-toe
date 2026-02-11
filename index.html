@@ -127,6 +127,7 @@
       [0,4,8], [2,4,6]
     ];
 
+    // Normal interstitial (used on game start)
     function showInterstitialAd() {
       if (typeof show_10593986 === "function") {
         show_10593986({
@@ -139,6 +140,28 @@
             everyPage: false
           }
         });
+      }
+    }
+
+    // Rewarded interstitial (used on reset)
+    function showRewardedAd(onReward) {
+      if (typeof show_10593986 === "function") {
+        show_10593986()
+          .then(() => {
+            if (typeof onReward === "function") {
+              onReward();
+            }
+          })
+          .catch(() => {
+            // Ad skipped or failed — continue anyway
+            if (typeof onReward === "function") {
+              onReward();
+            }
+          });
+      } else {
+        if (typeof onReward === "function") {
+          onReward();
+        }
       }
     }
 
@@ -191,14 +214,16 @@
     }
 
     function resetGame() {
-      board = Array(9).fill("");
-      currentPlayer = "X";
-      gameActive = true;
-      statusEl.textContent = "Player X's turn";
-      createBoard();
+      showRewardedAd(() => {
+        // Reward logic after ad
+        alert("You have seen an ad!");
 
-      // Optional: show ad on reset
-      setTimeout(showInterstitialAd, 1000);
+        board = Array(9).fill("");
+        currentPlayer = "X";
+        gameActive = true;
+        statusEl.textContent = "Player X's turn";
+        createBoard();
+      });
     }
   </script>
 
